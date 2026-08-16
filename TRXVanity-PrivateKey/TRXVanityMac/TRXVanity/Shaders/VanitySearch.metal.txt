@@ -1,0 +1,1090 @@
+#include <metal_stdlib>
+using namespace metal;
+
+// ==========================================
+// TRX Vanity for macOS - combined prefix/suffix search kernel.
+// Derived from mrtozner/tron-vanity-metal under the MIT license; see
+// ThirdPartyLicenses/tron-vanity-metal-MIT.txt. This version fixes the inverse
+// exponent in the upstream suffix shader, keeps all private scalars on the CPU,
+// walks fixed-generator affine windows, and performs an exact 25-byte range
+// check for a prefix beginning at Base58 character 3.
+// ==========================================
+
+// ==========================================
+// 1. Data Structures
+// ==========================================
+
+struct uint256_t {
+    uint d[8];
+};
+
+struct JacobianPoint {
+    uint256_t x;
+    uint256_t y;
+    uint256_t z;
+};
+
+struct AffinePoint {
+    uint256_t x;
+    uint256_t y;
+};
+
+// ==========================================
+// 2. Secp256k1 Constants
+// ==========================================
+
+constant uint256_t SECP256K1_P = {
+    {0xFFFFFC2F, 0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF,
+     0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF}
+};
+
+constant uint256_t P_MINUS_2 = {
+    {0xFFFFFC2D, 0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF,
+     0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF}
+};
+
+// ==========================================
+// 3. Low-Level Arithmetic
+// ==========================================
+
+inline uint add_with_carry(thread uint256_t& r, thread const uint256_t& a, thread const uint256_t& b) {
+    uint carry = 0;
+    for (int i = 0; i < 8; i++) {
+        ulong sum = (ulong)a.d[i] + b.d[i] + carry;
+        r.d[i] = (uint)sum;
+        carry = (uint)(sum >> 32);
+    }
+    return carry;
+}
+
+inline uint add_with_carry_const(thread uint256_t& r, thread const uint256_t& a, constant uint256_t& b) {
+    uint carry = 0;
+    for (int i = 0; i < 8; i++) {
+        ulong sum = (ulong)a.d[i] + b.d[i] + carry;
+        r.d[i] = (uint)sum;
+        carry = (uint)(sum >> 32);
+    }
+    return carry;
+}
+
+inline uint sub_with_borrow(thread uint256_t& r, thread const uint256_t& a, thread const uint256_t& b) {
+    uint borrow = 0;
+    for (int i = 0; i < 8; i++) {
+        long diff = (long)a.d[i] - b.d[i] - borrow;
+        r.d[i] = (uint)diff;
+        borrow = (diff < 0) ? 1 : 0;
+    }
+    return borrow;
+}
+
+inline uint sub_with_borrow_const(thread uint256_t& r, thread const uint256_t& a, constant uint256_t& b) {
+    uint borrow = 0;
+    for (int i = 0; i < 8; i++) {
+        long diff = (long)a.d[i] - b.d[i] - borrow;
+        r.d[i] = (uint)diff;
+        borrow = (diff < 0) ? 1 : 0;
+    }
+    return borrow;
+}
+
+inline bool gte_const(thread const uint256_t& a, constant uint256_t& b) {
+    for (int i = 7; i >= 0; i--) {
+        if (a.d[i] > b.d[i]) return true;
+        if (a.d[i] < b.d[i]) return false;
+    }
+    return true;
+}
+
+// ==========================================
+// 4. Modular Arithmetic
+// ==========================================
+
+inline void mod_add(thread uint256_t& r, thread const uint256_t& a, thread const uint256_t& b) {
+    uint carry = add_with_carry(r, a, b);
+    if (carry || gte_const(r, SECP256K1_P)) {
+        sub_with_borrow_const(r, r, SECP256K1_P);
+    }
+}
+
+inline void mod_sub(thread uint256_t& r, thread const uint256_t& a, thread const uint256_t& b) {
+    uint borrow = sub_with_borrow(r, a, b);
+    if (borrow) {
+        add_with_carry_const(r, r, SECP256K1_P);
+    }
+}
+
+void mul_mod(thread uint256_t& r, thread const uint256_t& a, thread const uint256_t& b) {
+    uint c[16] = {0};
+    for (int i = 0; i < 8; i++) {
+        ulong carry = 0;
+        for (int j = 0; j < 8; j++) {
+            ulong prod = (ulong)a.d[i] * b.d[j] + c[i+j] + carry;
+            c[i+j] = (uint)prod;
+            carry = prod >> 32;
+        }
+        c[i+8] = (uint)carry;
+    }
+
+    uint256_t U, L;
+    for (int i = 0; i < 8; i++) {
+        U.d[i] = c[i+8];
+        L.d[i] = c[i];
+    }
+
+    uint256_t U_times_977 = {{0,0,0,0,0,0,0,0}};
+    ulong carry_977 = 0;
+    for (int i = 0; i < 8; i++) {
+        ulong prod = (ulong)U.d[i] * 977 + U_times_977.d[i] + carry_977;
+        U_times_977.d[i] = (uint)prod;
+        carry_977 = prod >> 32;
+    }
+
+    uint carry_main = add_with_carry(r, L, U_times_977);
+
+    ulong shift_carry = 0;
+    for (int i = 1; i < 8; i++) {
+        ulong sum = (ulong)r.d[i] + U.d[i-1] + shift_carry;
+        r.d[i] = (uint)sum;
+        shift_carry = sum >> 32;
+    }
+
+    uint total_overflow = (uint)carry_977 + carry_main + (uint)shift_carry + U.d[7];
+
+    ulong val_977 = (ulong)total_overflow * 977;
+    ulong final_carry = 0;
+    {
+        ulong sum = (ulong)r.d[0] + val_977;
+        r.d[0] = (uint)sum;
+        final_carry = sum >> 32;
+    }
+    for (int i = 1; i < 8; i++) {
+        ulong sum = (ulong)r.d[i] + final_carry;
+        r.d[i] = (uint)sum;
+        final_carry = sum >> 32;
+    }
+
+    {
+        ulong sum = (ulong)r.d[1] + total_overflow;
+        r.d[1] = (uint)sum;
+        ulong inner_carry = sum >> 32;
+        for (int i = 2; i < 8; i++) {
+            ulong s = (ulong)r.d[i] + inner_carry;
+            r.d[i] = (uint)s;
+            inner_carry = s >> 32;
+        }
+    }
+
+    if (gte_const(r, SECP256K1_P)) sub_with_borrow_const(r, r, SECP256K1_P);
+    if (gte_const(r, SECP256K1_P)) sub_with_borrow_const(r, r, SECP256K1_P);
+}
+
+void mul_mod_const(thread uint256_t& r, constant uint256_t& a, thread const uint256_t& b) {
+    uint256_t a_copy;
+    for (int i = 0; i < 8; i++) a_copy.d[i] = a.d[i];
+    mul_mod(r, a_copy, b);
+}
+
+void mul_mod_const2(thread uint256_t& r, thread const uint256_t& a, constant uint256_t& b) {
+    uint256_t b_copy;
+    for (int i = 0; i < 8; i++) b_copy.d[i] = b.d[i];
+    mul_mod(r, a, b_copy);
+}
+
+void sqr_mod(thread uint256_t& r, thread const uint256_t& a) {
+    mul_mod(r, a, a);
+}
+
+// ==========================================
+// 5. Modular Inverse
+// ==========================================
+
+void pow_mod(thread uint256_t& r, thread const uint256_t& base, constant uint256_t& exp) {
+    for(int i=0; i<8; i++) r.d[i] = 0;
+    r.d[0] = 1;
+    uint256_t a = base;
+    for (int i = 0; i < 256; i++) {
+        int limb_idx = i / 32;
+        int bit_idx = i % 32;
+        if ((exp.d[limb_idx] >> bit_idx) & 1) {
+            mul_mod(r, r, a);
+        }
+        if (i < 255) {
+            sqr_mod(a, a);
+        }
+    }
+}
+
+void inv_mod(thread uint256_t& r, thread const uint256_t& x) {
+    pow_mod(r, x, P_MINUS_2);
+}
+
+// ==========================================
+// Montgomery's Trick (Batch Inversion) - Window 32
+// ==========================================
+// Inverts 32 numbers simultaneously.
+// Cost: 1 inv_mod + 93 mul_mod (vs 32 inv_mod = ~4x speedup over window=8)
+
+inline void batch_inverse_32(thread uint256_t* values) {
+    uint256_t c[32]; // Prefix products
+
+    // 1. Calculate Prefix Products (31 muls)
+    c[0] = values[0];
+    mul_mod(c[1], c[0], values[1]);
+    mul_mod(c[2], c[1], values[2]);
+    mul_mod(c[3], c[2], values[3]);
+    mul_mod(c[4], c[3], values[4]);
+    mul_mod(c[5], c[4], values[5]);
+    mul_mod(c[6], c[5], values[6]);
+    mul_mod(c[7], c[6], values[7]);
+    mul_mod(c[8], c[7], values[8]);
+    mul_mod(c[9], c[8], values[9]);
+    mul_mod(c[10], c[9], values[10]);
+    mul_mod(c[11], c[10], values[11]);
+    mul_mod(c[12], c[11], values[12]);
+    mul_mod(c[13], c[12], values[13]);
+    mul_mod(c[14], c[13], values[14]);
+    mul_mod(c[15], c[14], values[15]);
+    mul_mod(c[16], c[15], values[16]);
+    mul_mod(c[17], c[16], values[17]);
+    mul_mod(c[18], c[17], values[18]);
+    mul_mod(c[19], c[18], values[19]);
+    mul_mod(c[20], c[19], values[20]);
+    mul_mod(c[21], c[20], values[21]);
+    mul_mod(c[22], c[21], values[22]);
+    mul_mod(c[23], c[22], values[23]);
+    mul_mod(c[24], c[23], values[24]);
+    mul_mod(c[25], c[24], values[25]);
+    mul_mod(c[26], c[25], values[26]);
+    mul_mod(c[27], c[26], values[27]);
+    mul_mod(c[28], c[27], values[28]);
+    mul_mod(c[29], c[28], values[29]);
+    mul_mod(c[30], c[29], values[30]);
+    mul_mod(c[31], c[30], values[31]);
+
+    // 2. Invert the Final Product (The ONLY expensive step)
+    uint256_t inv_all;
+    inv_mod(inv_all, c[31]);
+
+    // 3. Unwind backwards to find individual inverses (62 muls)
+    uint256_t accum_inv = inv_all;
+    uint256_t temp_v, next_accum;
+
+    // Process indices 31 down to 1
+    mul_mod(temp_v, accum_inv, c[30]);
+    mul_mod(next_accum, accum_inv, values[31]);
+    values[31] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[29]);
+    mul_mod(next_accum, accum_inv, values[30]);
+    values[30] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[28]);
+    mul_mod(next_accum, accum_inv, values[29]);
+    values[29] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[27]);
+    mul_mod(next_accum, accum_inv, values[28]);
+    values[28] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[26]);
+    mul_mod(next_accum, accum_inv, values[27]);
+    values[27] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[25]);
+    mul_mod(next_accum, accum_inv, values[26]);
+    values[26] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[24]);
+    mul_mod(next_accum, accum_inv, values[25]);
+    values[25] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[23]);
+    mul_mod(next_accum, accum_inv, values[24]);
+    values[24] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[22]);
+    mul_mod(next_accum, accum_inv, values[23]);
+    values[23] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[21]);
+    mul_mod(next_accum, accum_inv, values[22]);
+    values[22] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[20]);
+    mul_mod(next_accum, accum_inv, values[21]);
+    values[21] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[19]);
+    mul_mod(next_accum, accum_inv, values[20]);
+    values[20] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[18]);
+    mul_mod(next_accum, accum_inv, values[19]);
+    values[19] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[17]);
+    mul_mod(next_accum, accum_inv, values[18]);
+    values[18] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[16]);
+    mul_mod(next_accum, accum_inv, values[17]);
+    values[17] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[15]);
+    mul_mod(next_accum, accum_inv, values[16]);
+    values[16] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[14]);
+    mul_mod(next_accum, accum_inv, values[15]);
+    values[15] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[13]);
+    mul_mod(next_accum, accum_inv, values[14]);
+    values[14] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[12]);
+    mul_mod(next_accum, accum_inv, values[13]);
+    values[13] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[11]);
+    mul_mod(next_accum, accum_inv, values[12]);
+    values[12] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[10]);
+    mul_mod(next_accum, accum_inv, values[11]);
+    values[11] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[9]);
+    mul_mod(next_accum, accum_inv, values[10]);
+    values[10] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[8]);
+    mul_mod(next_accum, accum_inv, values[9]);
+    values[9] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[7]);
+    mul_mod(next_accum, accum_inv, values[8]);
+    values[8] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[6]);
+    mul_mod(next_accum, accum_inv, values[7]);
+    values[7] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[5]);
+    mul_mod(next_accum, accum_inv, values[6]);
+    values[6] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[4]);
+    mul_mod(next_accum, accum_inv, values[5]);
+    values[5] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[3]);
+    mul_mod(next_accum, accum_inv, values[4]);
+    values[4] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[2]);
+    mul_mod(next_accum, accum_inv, values[3]);
+    values[3] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[1]);
+    mul_mod(next_accum, accum_inv, values[2]);
+    values[2] = temp_v;
+    accum_inv = next_accum;
+
+    mul_mod(temp_v, accum_inv, c[0]);
+    mul_mod(next_accum, accum_inv, values[1]);
+    values[1] = temp_v;
+    accum_inv = next_accum;
+
+    // Index 0: accum_inv is now values[0]^-1
+    values[0] = accum_inv;
+}
+
+// ==========================================
+// 6. Point Addition
+// ==========================================
+
+void point_add_mixed(thread JacobianPoint& P,
+                     constant uint256_t& step_x,
+                     constant uint256_t& step_y) {
+    bool p_is_inf = true;
+    for(int i=0; i<8; i++) {
+        if(P.z.d[i] != 0) { p_is_inf = false; break; }
+    }
+    if (p_is_inf) {
+        P.x = step_x; P.y = step_y;
+        for(int i=1; i<8; i++) P.z.d[i] = 0;
+        P.z.d[0] = 1;
+        return;
+    }
+
+    uint256_t z1z1, u2, s2, h, hh, r, v, h_cubed, r_sq, two_v, v_minus_x3, term1, term2;
+    sqr_mod(z1z1, P.z);
+    mul_mod_const(u2, step_x, z1z1);
+    mul_mod(s2, P.z, z1z1);
+    mul_mod_const2(s2, s2, step_y);
+    mod_sub(h, u2, P.x);
+    sqr_mod(hh, h);
+    mod_sub(r, s2, P.y);
+    mul_mod(h_cubed, h, hh);
+    mul_mod(v, P.x, hh);
+    sqr_mod(r_sq, r);
+    mod_sub(P.x, r_sq, h_cubed);
+    mod_add(two_v, v, v);
+    mod_sub(P.x, P.x, two_v);
+    mod_sub(v_minus_x3, v, P.x);
+    mul_mod(term1, r, v_minus_x3);
+    mul_mod(term2, P.y, h_cubed);
+    mod_sub(P.y, term1, term2);
+    mul_mod(P.z, P.z, h);
+}
+
+void jacobian_to_affine(thread JacobianPoint& P, thread uint256_t& x, thread uint256_t& y) {
+    uint256_t z_inv, z_inv2, z_inv3;
+    inv_mod(z_inv, P.z);
+    sqr_mod(z_inv2, z_inv);
+    mul_mod(z_inv3, z_inv2, z_inv);
+    mul_mod(x, P.x, z_inv2);
+    mul_mod(y, P.y, z_inv3);
+}
+
+// ==========================================
+// 7. Optimized Keccak-256 (Unrolled)
+// ==========================================
+
+inline ulong rotl64(ulong x, uint n) {
+    return (x << n) | (x >> (64 - n));
+}
+
+constant ulong RC[24] = {
+    0x0000000000000001UL, 0x0000000000008082UL, 0x800000000000808aUL, 0x8000000080008000UL,
+    0x000000000000808bUL, 0x0000000080000001UL, 0x8000000080008081UL, 0x8000000000008009UL,
+    0x000000000000008aUL, 0x0000000000000088UL, 0x0000000080008009UL, 0x000000008000000aUL,
+    0x000000008000808bUL, 0x800000000000008bUL, 0x8000000000008089UL, 0x8000000000008003UL,
+    0x8000000000008002UL, 0x8000000000000080UL, 0x000000000000800aUL, 0x800000008000000aUL,
+    0x8000000080008081UL, 0x8000000000008080UL, 0x0000000080000001UL, 0x8000000080008008UL
+};
+
+void keccak_f1600_fast(thread ulong* st) {
+    #pragma unroll
+    for (int r = 0; r < 24; r++) {
+        // Theta
+        ulong bc0 = st[0] ^ st[5] ^ st[10] ^ st[15] ^ st[20];
+        ulong bc1 = st[1] ^ st[6] ^ st[11] ^ st[16] ^ st[21];
+        ulong bc2 = st[2] ^ st[7] ^ st[12] ^ st[17] ^ st[22];
+        ulong bc3 = st[3] ^ st[8] ^ st[13] ^ st[18] ^ st[23];
+        ulong bc4 = st[4] ^ st[9] ^ st[14] ^ st[19] ^ st[24];
+
+        ulong t0 = bc4 ^ rotl64(bc1, 1);
+        ulong t1 = bc0 ^ rotl64(bc2, 1);
+        ulong t2 = bc1 ^ rotl64(bc3, 1);
+        ulong t3 = bc2 ^ rotl64(bc4, 1);
+        ulong t4 = bc3 ^ rotl64(bc0, 1);
+
+        st[0] ^= t0; st[5] ^= t0; st[10] ^= t0; st[15] ^= t0; st[20] ^= t0;
+        st[1] ^= t1; st[6] ^= t1; st[11] ^= t1; st[16] ^= t1; st[21] ^= t1;
+        st[2] ^= t2; st[7] ^= t2; st[12] ^= t2; st[17] ^= t2; st[22] ^= t2;
+        st[3] ^= t3; st[8] ^= t3; st[13] ^= t3; st[18] ^= t3; st[23] ^= t3;
+        st[4] ^= t4; st[9] ^= t4; st[14] ^= t4; st[19] ^= t4; st[24] ^= t4;
+
+        // Rho & Pi (hardcoded rotations)
+        ulong temp = st[1];
+        st[1] = rotl64(st[6], 44);
+        st[6] = rotl64(st[9], 20);
+        st[9] = rotl64(st[22], 61);
+        st[22] = rotl64(st[14], 39);
+        st[14] = rotl64(st[20], 18);
+        st[20] = rotl64(st[2], 62);
+        st[2] = rotl64(st[12], 43);
+        st[12] = rotl64(st[13], 25);
+        st[13] = rotl64(st[19], 8);
+        st[19] = rotl64(st[23], 56);
+        st[23] = rotl64(st[15], 41);
+        st[15] = rotl64(st[4], 27);
+        st[4] = rotl64(st[24], 14);
+        st[24] = rotl64(st[21], 2);
+        st[21] = rotl64(st[8], 55);
+        st[8] = rotl64(st[16], 45);
+        st[16] = rotl64(st[5], 36);
+        st[5] = rotl64(st[3], 28);
+        st[3] = rotl64(st[18], 21);
+        st[18] = rotl64(st[17], 15);
+        st[17] = rotl64(st[11], 10);
+        st[11] = rotl64(st[7], 6);
+        st[7] = rotl64(st[10], 3);
+        st[10] = rotl64(temp, 1);
+
+        // Chi
+        ulong v0, v1, v2, v3, v4;
+
+        v0 = st[0]; v1 = st[1]; v2 = st[2]; v3 = st[3]; v4 = st[4];
+        st[0] ^= (~v1) & v2; st[1] ^= (~v2) & v3; st[2] ^= (~v3) & v4; st[3] ^= (~v4) & v0; st[4] ^= (~v0) & v1;
+
+        v0 = st[5]; v1 = st[6]; v2 = st[7]; v3 = st[8]; v4 = st[9];
+        st[5] ^= (~v1) & v2; st[6] ^= (~v2) & v3; st[7] ^= (~v3) & v4; st[8] ^= (~v4) & v0; st[9] ^= (~v0) & v1;
+
+        v0 = st[10]; v1 = st[11]; v2 = st[12]; v3 = st[13]; v4 = st[14];
+        st[10] ^= (~v1) & v2; st[11] ^= (~v2) & v3; st[12] ^= (~v3) & v4; st[13] ^= (~v4) & v0; st[14] ^= (~v0) & v1;
+
+        v0 = st[15]; v1 = st[16]; v2 = st[17]; v3 = st[18]; v4 = st[19];
+        st[15] ^= (~v1) & v2; st[16] ^= (~v2) & v3; st[17] ^= (~v3) & v4; st[18] ^= (~v4) & v0; st[19] ^= (~v0) & v1;
+
+        v0 = st[20]; v1 = st[21]; v2 = st[22]; v3 = st[23]; v4 = st[24];
+        st[20] ^= (~v1) & v2; st[21] ^= (~v2) & v3; st[22] ^= (~v3) & v4; st[23] ^= (~v4) & v0; st[24] ^= (~v0) & v1;
+
+        // Iota
+        st[0] ^= RC[r];
+    }
+}
+
+// Optimized for 64-byte input (public key X || Y)
+inline void keccak_256_64_fast(thread const uchar* input, thread uchar* output) {
+    ulong state[25] = {0};
+
+    // Absorb 64 bytes as 8 ulongs (little-endian)
+    thread const ulong* in_u64 = (thread const ulong*)input;
+    state[0] ^= in_u64[0];
+    state[1] ^= in_u64[1];
+    state[2] ^= in_u64[2];
+    state[3] ^= in_u64[3];
+    state[4] ^= in_u64[4];
+    state[5] ^= in_u64[5];
+    state[6] ^= in_u64[6];
+    state[7] ^= in_u64[7];
+
+    // Padding: 0x01 at byte 64, 0x80 at byte 135
+    state[8] ^= 0x0000000000000001UL;
+    state[16] ^= 0x8000000000000000UL;
+
+    // Permute
+    keccak_f1600_fast(state);
+
+    // Squeeze 32 bytes
+    thread ulong* out_u64 = (thread ulong*)output;
+    out_u64[0] = state[0];
+    out_u64[1] = state[1];
+    out_u64[2] = state[2];
+    out_u64[3] = state[3];
+}
+
+// ==========================================
+// 8. SHA-256 (Optimized - No Register Spilling)
+// ==========================================
+
+constant uint K[64] = {
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+};
+
+#define ROTR(x, n) ((x >> n) | (x << (32 - n)))
+#define CH(x, y, z) ((x & y) ^ (~x & z))
+#define MAJ(x, y, z) ((x & y) ^ (x & z) ^ (y & z))
+#define SIGMA0(x) (ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22))
+#define SIGMA1(x) (ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25))
+#define sigma0(x) (ROTR(x, 7) ^ ROTR(x, 18) ^ (x >> 3))
+#define sigma1(x) (ROTR(x, 17) ^ ROTR(x, 19) ^ (x >> 10))
+
+// Single round step
+inline void round_step(thread uint& a, thread uint& b, thread uint& c, thread uint& d,
+                       thread uint& e, thread uint& f, thread uint& g, thread uint& h,
+                       uint k, uint w) {
+    uint t1 = h + SIGMA1(e) + CH(e, f, g) + k + w;
+    uint t2 = SIGMA0(a) + MAJ(a, b, c);
+    h = g; g = f; f = e; e = d + t1;
+    d = c; c = b; b = a; a = t1 + t2;
+}
+
+// Specialized: Hash 21 bytes (Address payload) -> 32 bytes
+inline void sha256_21bytes(thread const uchar* input, thread uint* output) {
+    uint a = 0x6a09e667, b = 0xbb67ae85, c = 0x3c6ef372, d = 0xa54ff53a;
+    uint e = 0x510e527f, f = 0x9b05688c, g = 0x1f83d9ab, h = 0x5be0cd19;
+
+    // Load W0..W15 directly into registers
+    uint w0 = ((uint)input[0] << 24) | ((uint)input[1] << 16) | ((uint)input[2] << 8) | input[3];
+    uint w1 = ((uint)input[4] << 24) | ((uint)input[5] << 16) | ((uint)input[6] << 8) | input[7];
+    uint w2 = ((uint)input[8] << 24) | ((uint)input[9] << 16) | ((uint)input[10] << 8) | input[11];
+    uint w3 = ((uint)input[12] << 24) | ((uint)input[13] << 16) | ((uint)input[14] << 8) | input[15];
+    uint w4 = ((uint)input[16] << 24) | ((uint)input[17] << 16) | ((uint)input[18] << 8) | input[19];
+    uint w5 = ((uint)input[20] << 24) | 0x00800000;  // Last byte + padding
+    uint w6 = 0, w7 = 0, w8 = 0, w9 = 0, w10 = 0, w11 = 0, w12 = 0, w13 = 0, w14 = 0;
+    uint w15 = 168;  // Length in bits
+
+    // Rounds 0-15
+    round_step(a,b,c,d,e,f,g,h, K[0], w0);
+    round_step(a,b,c,d,e,f,g,h, K[1], w1);
+    round_step(a,b,c,d,e,f,g,h, K[2], w2);
+    round_step(a,b,c,d,e,f,g,h, K[3], w3);
+    round_step(a,b,c,d,e,f,g,h, K[4], w4);
+    round_step(a,b,c,d,e,f,g,h, K[5], w5);
+    round_step(a,b,c,d,e,f,g,h, K[6], w6);
+    round_step(a,b,c,d,e,f,g,h, K[7], w7);
+    round_step(a,b,c,d,e,f,g,h, K[8], w8);
+    round_step(a,b,c,d,e,f,g,h, K[9], w9);
+    round_step(a,b,c,d,e,f,g,h, K[10], w10);
+    round_step(a,b,c,d,e,f,g,h, K[11], w11);
+    round_step(a,b,c,d,e,f,g,h, K[12], w12);
+    round_step(a,b,c,d,e,f,g,h, K[13], w13);
+    round_step(a,b,c,d,e,f,g,h, K[14], w14);
+    round_step(a,b,c,d,e,f,g,h, K[15], w15);
+
+    // Rounds 16-63: calculate W on-the-fly using sliding window
+    for (int i = 16; i < 64; i++) {
+        uint w_next = sigma1(w14) + w9 + sigma0(w1) + w0;
+        round_step(a,b,c,d,e,f,g,h, K[i], w_next);
+        w0 = w1; w1 = w2; w2 = w3; w3 = w4;
+        w4 = w5; w5 = w6; w6 = w7; w7 = w8;
+        w8 = w9; w9 = w10; w10 = w11; w11 = w12;
+        w12 = w13; w13 = w14; w14 = w15; w15 = w_next;
+    }
+
+    output[0] = a + 0x6a09e667;
+    output[1] = b + 0xbb67ae85;
+    output[2] = c + 0x3c6ef372;
+    output[3] = d + 0xa54ff53a;
+    output[4] = e + 0x510e527f;
+    output[5] = f + 0x9b05688c;
+    output[6] = g + 0x1f83d9ab;
+    output[7] = h + 0x5be0cd19;
+}
+
+// Specialized: Hash 32 bytes (Pass 1 result) -> 32 bytes
+inline void sha256_32bytes(thread const uint* input, thread uint* output) {
+    uint a = 0x6a09e667, b = 0xbb67ae85, c = 0x3c6ef372, d = 0xa54ff53a;
+    uint e = 0x510e527f, f = 0x9b05688c, g = 0x1f83d9ab, h = 0x5be0cd19;
+
+    uint w0 = input[0], w1 = input[1], w2 = input[2], w3 = input[3];
+    uint w4 = input[4], w5 = input[5], w6 = input[6], w7 = input[7];
+    uint w8 = 0x80000000;  // Padding
+    uint w9 = 0, w10 = 0, w11 = 0, w12 = 0, w13 = 0, w14 = 0;
+    uint w15 = 256;  // Length in bits
+
+    // Rounds 0-15
+    round_step(a,b,c,d,e,f,g,h, K[0], w0);
+    round_step(a,b,c,d,e,f,g,h, K[1], w1);
+    round_step(a,b,c,d,e,f,g,h, K[2], w2);
+    round_step(a,b,c,d,e,f,g,h, K[3], w3);
+    round_step(a,b,c,d,e,f,g,h, K[4], w4);
+    round_step(a,b,c,d,e,f,g,h, K[5], w5);
+    round_step(a,b,c,d,e,f,g,h, K[6], w6);
+    round_step(a,b,c,d,e,f,g,h, K[7], w7);
+    round_step(a,b,c,d,e,f,g,h, K[8], w8);
+    round_step(a,b,c,d,e,f,g,h, K[9], w9);
+    round_step(a,b,c,d,e,f,g,h, K[10], w10);
+    round_step(a,b,c,d,e,f,g,h, K[11], w11);
+    round_step(a,b,c,d,e,f,g,h, K[12], w12);
+    round_step(a,b,c,d,e,f,g,h, K[13], w13);
+    round_step(a,b,c,d,e,f,g,h, K[14], w14);
+    round_step(a,b,c,d,e,f,g,h, K[15], w15);
+
+    // Rounds 16-63
+    for (int i = 16; i < 64; i++) {
+        uint w_next = sigma1(w14) + w9 + sigma0(w1) + w0;
+        round_step(a,b,c,d,e,f,g,h, K[i], w_next);
+        w0 = w1; w1 = w2; w2 = w3; w3 = w4;
+        w4 = w5; w5 = w6; w6 = w7; w7 = w8;
+        w8 = w9; w9 = w10; w10 = w11; w11 = w12;
+        w12 = w13; w13 = w14; w14 = w15; w15 = w_next;
+    }
+
+    output[0] = a + 0x6a09e667;
+    output[1] = b + 0xbb67ae85;
+    output[2] = c + 0x3c6ef372;
+    output[3] = d + 0xa54ff53a;
+    output[4] = e + 0x510e527f;
+    output[5] = f + 0x9b05688c;
+    output[6] = g + 0x1f83d9ab;
+    output[7] = h + 0x5be0cd19;
+}
+
+// ==========================================
+// 9. Helpers
+// ==========================================
+
+inline void uint256_to_bytes(thread const uint256_t& num, thread uchar* bytes) {
+    for (int i = 0; i < 8; i++) {
+        int byte_offset = (7 - i) * 4;
+        uint limb = num.d[i];
+        bytes[byte_offset + 3] = (uchar)(limb & 0xFF);
+        bytes[byte_offset + 2] = (uchar)((limb >> 8) & 0xFF);
+        bytes[byte_offset + 1] = (uchar)((limb >> 16) & 0xFF);
+        bytes[byte_offset + 0] = (uchar)((limb >> 24) & 0xFF);
+    }
+}
+
+inline ulong add_mod_reduced(ulong lhs, ulong rhs, ulong modulus) {
+    // Both operands are already below modulus. Subtracting the complementary gap
+    // computes lhs + rhs - modulus without ever forming an overflowing sum.
+    return lhs >= modulus - rhs
+        ? lhs - (modulus - rhs)
+        : lhs + rhs;
+}
+
+// Calculate (25-byte address % modulus) for Base58 suffix checks. At ten
+// characters 58^10 fits in ulong, but remainder * 256 does not. Eight modular
+// doublings preserve the full range without relying on overflowing arithmetic.
+inline ulong calc_suffix_mod(thread const uchar* data, ulong modulus) {
+    ulong remainder = 0;
+    if (modulus <= (~0ul) / 256ul) {
+        // Covers suffix lengths 1...9. Preserve the single-modulo hot path;
+        // only 58^10 needs overflow-safe modular doubling.
+        for (int i = 0; i < 25; i++) {
+            remainder = (remainder * 256ul + (ulong)data[i]) % modulus;
+        }
+        return remainder;
+    }
+
+    for (int i = 0; i < 25; i++) {
+        for (int bit = 0; bit < 8; bit++) {
+            remainder = add_mod_reduced(remainder, remainder, modulus);
+        }
+        // The ten-character modulus is much larger than a byte, so both
+        // operands satisfy add_mod_reduced's precondition without `%`.
+        remainder = add_mod_reduced(remainder, (ulong)data[i], modulus);
+    }
+    return remainder;
+}
+
+// Base58^2 prefilter for suffix searches. For a 25-byte big-endian integer N,
+// N mod 58^2 is the weighted sum of its bytes where each weight is
+// 256^(24-i) mod 3364. The largest possible sum is below 2^25, so UInt32 is
+// sufficient and the hot path pays for only one constant-modulus reduction.
+constant ushort SUFFIX_PROBE_WEIGHTS[25] = {
+    1064, 924, 1068, 1016, 3184, 2588, 2336, 3268, 1156,
+    3040, 2640, 168, 500, 1408, 2108, 1388, 1648, 900,
+    516, 1776, 480, 948, 1620, 256, 1
+};
+
+inline uint calc_suffix_probe(thread const uchar* data) {
+    uint weighted_sum = 0;
+    #pragma unroll
+    for (uint i = 0; i < 25; i++) {
+        weighted_sum += (uint)data[i] * (uint)SUFFIX_PROBE_WEIGHTS[i];
+    }
+    return weighted_sum % 3364u;
+}
+
+// Small diagnostic entry point used by integration tests to compare Metal's
+// overflow-safe suffix arithmetic with the CPU for all supported lengths.
+kernel void trx_suffix_mod_batch(
+    device const uchar* addresses [[ buffer(0) ]],
+    device const ulong* moduli     [[ buffer(1) ]],
+    device ulong* remainders       [[ buffer(2) ]],
+    uint gid [[ thread_position_in_grid ]])
+{
+    uchar local_address[25];
+    for (uint i = 0; i < 25; i++) {
+        local_address[i] = addresses[(gid * 25) + i];
+    }
+    remainders[gid] = calc_suffix_mod(local_address, moduli[gid]);
+}
+
+// Diagnostic entry point used to verify the constant-weight probe against an
+// independent CPU modulo implementation.
+kernel void trx_suffix_probe_batch(
+    device const uchar* addresses [[ buffer(0) ]],
+    device uint* probes            [[ buffer(1) ]],
+    uint gid [[ thread_position_in_grid ]])
+{
+    uchar local_address[25];
+    for (uint i = 0; i < 25; i++) {
+        local_address[i] = addresses[(gid * 25) + i];
+    }
+    probes[gid] = calc_suffix_probe(local_address);
+}
+
+inline int compare_big_endian(thread const uchar* lhs,
+                              device const uchar* rhs,
+                              uint count) {
+    for (uint i = 0; i < count; i++) {
+        if (lhs[i] < rhs[i]) return -1;
+        if (lhs[i] > rhs[i]) return 1;
+    }
+    return 0;
+}
+
+inline bool matches_any_range(thread const uchar* value,
+                              uint value_length,
+                              device const uchar* range_mins,
+                              device const uchar* range_maxs,
+                              uint range_count) {
+    for (uint range_index = 0; range_index < range_count; range_index++) {
+        device const uchar* lower = range_mins + (range_index * value_length);
+        device const uchar* upper = range_maxs + (range_index * value_length);
+        if (compare_big_endian(value, lower, value_length) >= 0
+            && compare_big_endian(value, upper, value_length) <= 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// ==========================================
+// 10. Affine Fixed-Generator Search Kernel
+// ==========================================
+
+inline bool is_zero_256(thread const uint256_t& value) {
+    uint combined = 0;
+    #pragma unroll
+    for (uint limb = 0; limb < 8; limb++) combined |= value.d[limb];
+    return combined == 0;
+}
+
+// Compile-time tuning knob shared with MetalVanitySearcher.affineWindowSize.
+// steps_per_thread must be exactly divisible by this value.
+#define AFFINE_WINDOW_SIZE 1024
+
+// Calculates base + offset when (offset.x - base.x)^-1 is already available.
+// A fixed generator table lets a lane generate the whole next window from one
+// affine base while paying for only one batched field inversion.
+inline void affine_add_with_inverse(thread AffinePoint& result,
+                                    thread const AffinePoint& base,
+                                    constant AffinePoint& offset,
+                                    thread const uint256_t& inverse_denominator) {
+    uint256_t offset_x = offset.x;
+    uint256_t offset_y = offset.y;
+    uint256_t delta_y, slope, slope_squared, x_delta;
+    mod_sub(delta_y, offset_y, base.y);
+    mul_mod(slope, delta_y, inverse_denominator);
+    sqr_mod(slope_squared, slope);
+    mod_sub(result.x, slope_squared, base.x);
+    mod_sub(result.x, result.x, offset_x);
+    mod_sub(x_delta, base.x, result.x);
+    mul_mod(result.y, slope, x_delta);
+    mod_sub(result.y, result.y, base.y);
+}
+
+kernel void trx_vanity_search(
+    device AffinePoint* lane_points           [[ buffer(0) ]],
+    constant AffinePoint* generator_multiples [[ buffer(1) ]],
+    constant ulong& target_modulus            [[ buffer(2) ]],
+    constant ulong& target_remainder          [[ buffer(3) ]],
+    device atomic_uint* found_flag            [[ buffer(4) ]],
+    device uint* result_thread_id             [[ buffer(5) ]],
+    device uint* result_offset                [[ buffer(6) ]],
+    constant uint& steps_per_thread           [[ buffer(7) ]],
+    device const uchar* payload_range_mins    [[ buffer(8) ]],
+    device const uchar* payload_range_maxs    [[ buffer(9) ]],
+    device const uchar* full_range_mins       [[ buffer(10) ]],
+    device const uchar* full_range_maxs       [[ buffer(11) ]],
+    constant uint& prefix_range_count         [[ buffer(12) ]],
+    device uint* processed_counts             [[ buffer(13) ]],
+    device atomic_uint* invalid_epoch         [[ buffer(14) ]],
+    constant uint& target_suffix_probe        [[ buffer(15) ]],
+    uint gid [[ thread_position_in_grid ]])
+{
+    uint processed = 0;
+    AffinePoint P = lane_points[gid];
+    if (atomic_load_explicit(found_flag, memory_order_relaxed) > 0
+        || atomic_load_explicit(invalid_epoch, memory_order_relaxed) > 0) {
+        processed_counts[gid] = processed;
+        return;
+    }
+
+    uint num_batches = steps_per_thread / AFFINE_WINDOW_SIZE;
+
+    for (uint batch = 0; batch < num_batches; batch++) {
+        if (batch > 0
+            && (atomic_load_explicit(found_flag, memory_order_relaxed) > 0
+                || atomic_load_explicit(invalid_epoch, memory_order_relaxed) > 0)) {
+            lane_points[gid] = P;
+            processed_counts[gid] = processed;
+            return;
+        }
+
+        // The same array first stores denominator prefix products, then is
+        // overwritten in-place with the individual inverses. This is the only
+        // window-sized private array retained by each thread.
+        uint256_t denominator_inverses[AFFINE_WINDOW_SIZE];
+        uint256_t denominator;
+
+        uint256_t generator_x = generator_multiples[0].x;
+        mod_sub(denominator, generator_x, P.x);
+        if (is_zero_256(denominator)) {
+            atomic_store_explicit(invalid_epoch, 1, memory_order_relaxed);
+            lane_points[gid] = P;
+            processed_counts[gid] = processed;
+            return;
+        }
+        denominator_inverses[0] = denominator;
+
+        #pragma unroll
+        for (uint point_index = 1; point_index < AFFINE_WINDOW_SIZE; point_index++) {
+            generator_x = generator_multiples[point_index].x;
+            mod_sub(denominator, generator_x, P.x);
+            if (is_zero_256(denominator)) {
+                atomic_store_explicit(invalid_epoch, 1, memory_order_relaxed);
+                lane_points[gid] = P;
+                processed_counts[gid] = processed;
+                return;
+            }
+            mul_mod(
+                denominator_inverses[point_index],
+                denominator_inverses[point_index - 1],
+                denominator
+            );
+        }
+
+        uint256_t accumulated_inverse;
+        inv_mod(
+            accumulated_inverse,
+            denominator_inverses[AFFINE_WINDOW_SIZE - 1]
+        );
+
+        #pragma unroll
+        for (int point_index = AFFINE_WINDOW_SIZE - 1; point_index >= 1; point_index--) {
+            uint256_t individual_inverse, next_accumulated_inverse;
+            mul_mod(
+                individual_inverse,
+                accumulated_inverse,
+                denominator_inverses[point_index - 1]
+            );
+            // Recomputing this subtraction is much cheaper than retaining a
+            // second 1 KiB array of all original denominators.
+            generator_x = generator_multiples[point_index].x;
+            mod_sub(denominator, generator_x, P.x);
+            mul_mod(next_accumulated_inverse, accumulated_inverse, denominator);
+            denominator_inverses[point_index] = individual_inverse;
+            accumulated_inverse = next_accumulated_inverse;
+        }
+        denominator_inverses[0] = accumulated_inverse;
+
+        // Calculate the last point first so the persisted state is valid even
+        // when an earlier point in this window wins and returns immediately.
+        AffinePoint next_P;
+        affine_add_with_inverse(
+            next_P,
+            P,
+            generator_multiples[AFFINE_WINDOW_SIZE - 1],
+            denominator_inverses[AFFINE_WINDOW_SIZE - 1]
+        );
+
+        for (uint point_index = 0; point_index < AFFINE_WINDOW_SIZE; point_index++) {
+            AffinePoint candidate;
+            if (point_index == AFFINE_WINDOW_SIZE - 1) {
+                candidate = next_P;
+            } else {
+                affine_add_with_inverse(
+                    candidate,
+                    P,
+                    generator_multiples[point_index],
+                    denominator_inverses[point_index]
+                );
+            }
+
+            uchar public_key[64];
+            uint256_to_bytes(candidate.x, public_key);
+            uint256_to_bytes(candidate.y, public_key + 32);
+
+            uchar keccak_hash[32];
+            keccak_256_64_fast(public_key, keccak_hash);
+            processed += 1;
+
+            uchar address[25];
+            address[0] = 0x41;
+            for (uint byte_index = 0; byte_index < 20; byte_index++) {
+                address[1 + byte_index] = keccak_hash[12 + byte_index];
+            }
+
+            // Avoid the two SHA-256 compressions for almost all prefix misses.
+            if (prefix_range_count > 0
+                && !matches_any_range(address, 21, payload_range_mins,
+                                      payload_range_maxs, prefix_range_count)) {
+                continue;
+            }
+
+            uint pass1[8];
+            sha256_21bytes(address, pass1);
+            uint pass2[8];
+            sha256_32bytes(pass1, pass2);
+
+            uint checksum = pass2[0];
+            address[21] = (checksum >> 24) & 0xFF;
+            address[22] = (checksum >> 16) & 0xFF;
+            address[23] = (checksum >> 8) & 0xFF;
+            address[24] = checksum & 0xFF;
+
+            if (prefix_range_count > 0
+                && !matches_any_range(address, 25, full_range_mins,
+                                      full_range_maxs, prefix_range_count)) {
+                continue;
+            }
+
+            bool suffix_matches = true;
+            if (target_modulus != 1ul) {
+                uint suffix_probe = calc_suffix_probe(address);
+                if (target_modulus == 58ul) {
+                    // One Base58 digit: reducing the two-digit probe mod 58 is
+                    // already the exact answer.
+                    suffix_matches = (suffix_probe % 58u) == target_suffix_probe;
+                } else if (suffix_probe != target_suffix_probe) {
+                    suffix_matches = false;
+                } else if (target_modulus > 3364ul) {
+                    // Three or more digits: only about one candidate in 3364
+                    // reaches the expensive full-width modulo confirmation.
+                    suffix_matches = calc_suffix_mod(address, target_modulus)
+                        == target_remainder;
+                }
+                // At modulus 3364 the probe itself is the exact two-digit test.
+            }
+
+            if (suffix_matches) {
+                uint expected = 0;
+                bool claimed = false;
+                while (expected == 0 && !claimed) {
+                    claimed = atomic_compare_exchange_weak_explicit(
+                        found_flag, &expected, 1,
+                        memory_order_relaxed, memory_order_relaxed);
+                }
+                if (claimed) {
+                    *result_thread_id = gid;
+                    *result_offset = (batch * AFFINE_WINDOW_SIZE) + point_index + 1;
+                }
+                lane_points[gid] = next_P;
+                processed_counts[gid] = processed;
+                return;
+            }
+        }
+
+        P = next_P;
+    }
+
+    // Persist the next dispatch's public affine starting point. The buffer
+    // contains no scalar or private key.
+    lane_points[gid] = P;
+    processed_counts[gid] = processed;
+}

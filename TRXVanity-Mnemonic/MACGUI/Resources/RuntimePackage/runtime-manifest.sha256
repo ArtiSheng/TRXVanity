@@ -1,0 +1,13 @@
+3b2c7274b03d3a09fafd59ae80dbaf84ba0811ee331d422bd91cab143c1aaca7  ./build/bip39-english.txt
+94011808c23f2c4d64995665101d28984e971e4f03593efac1c3e7225d64d307  ./build/cuda-tuning-config.txt
+7a9da0cd479c5f1aadef4e6e24665a610035d67e84018a58a9909db80375a579  ./build/trxvanity-gpu
+2b97ff3232ffc483e36ce6dec13e27dcbe4aa372742874aeb2c25f62e9a3eb47  ./controller.py
+35f78052465af1bf2fe0ada13110826cc8ed343ca5b6ec8161fd37761adfe8b5  ./run-formal.sh
+e50b0f485e913356c13ec4fbc4f11728735a891cc78f17b3e845d969df53698e  ./scripts/create-volatile-secrets.sh
+82737c73183306f77ba5550d80601d1bc58d40246578e5c1f60a32579653106d  ./scripts/preflight-server.sh
+e66ad3934d189c01b3f19ab148b574c4287756160a98fe8d41976d2aa85c9cee  ./scripts/secure_cleanup.py
+357d9d4452dfa2e1c5255fde0c4bc90852bad9bea7b92ce2853b25c8d9b5e019  ./secure_cleanup.sh
+6d1bdaeb48d951ff16e1492a5ae3220bfac9a9f378b71e5dc741edb59e54ecfb  ./status.sh
+d612ad4a306fc8605ff67c3e51c949a31be8dd5a390ddc7bded977f0843b78b8  ./web/app.js
+e7ddebe15a63203527465b087837109a89c50bed9793a0912bc8438f567cceee  ./web/index.html
+5042d3fb87abcf010f45e221bab171dad8f11bb9ef4dcdf6c215250dc36af33f  ./web/style.css

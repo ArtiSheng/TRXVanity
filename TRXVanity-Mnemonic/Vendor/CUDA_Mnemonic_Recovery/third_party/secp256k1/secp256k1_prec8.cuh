@@ -1,0 +1,1 @@
+extern __device__  secp256k1_ge_storage** prec;

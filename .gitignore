@@ -1,0 +1,32 @@
+.DS_Store
+.vscode/
+AGENTS.md
+*.suo
+*.user
+Thumbs.db
+Desktop.ini
+
+# Local secrets
+**/本地私密备份/
+*.pem
+*.key
+.env*
+
+# Python
+**/__pycache__/
+*.py[cod]
+
+# Build and runtime artifacts
+**/build/
+**/dist/
+**/dist-*/
+**/release/
+**/.build/
+**/DerivedData/
+**/.vs/
+**/xcuserdata/
+*.xcuserstate
+
+# Encrypted backups and heartbeat state
+**/*.trxv
+**/storage/heartbeat-state.json

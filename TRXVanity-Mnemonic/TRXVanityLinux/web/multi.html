@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>TRX Vanity 多机监控</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">TRX VANITY FLEET</p>
+        <h1>多机器搜索监控</h1>
+      </div>
+      <div class="connection"><span id="dot"></span><span id="connection">正在连接…</span></div>
+    </header>
+
+    <section class="summary">
+      <article class="panel total-speed">
+        <p class="label">所有机器总速度</p>
+        <strong id="totalSpeed">—</strong><small>/ 秒</small>
+      </article>
+      <article class="panel">
+        <p class="label">正在搜索</p>
+        <strong id="runningCount">—</strong>
+        <small id="onlineCount">等待状态</small>
+      </article>
+      <article class="panel">
+        <p class="label">累计搜索次数</p>
+        <strong id="totalAttempts">—</strong>
+        <small id="targetSuffix">等待搜索参数</small>
+      </article>
+    </section>
+
+    <section class="forecast panel">
+      <div class="forecast-heading">
+        <div>
+          <p class="label">当前搜索百分比</p>
+          <strong id="progress">—</strong>
+        </div>
+        <div class="probability">
+          <p class="label">当前累计命中概率</p>
+          <strong id="probability">—</strong>
+        </div>
+      </div>
+      <div class="progress-track" role="progressbar" aria-label="100% 平均搜索工作量进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progressBar"></span></div>
+      <p class="forecast-note">100% 表示完成一份平均搜索工作量，对应累计命中概率约 63.21%，并不代表保证命中。</p>
+      <div class="forecast-grid">
+        <div>
+          <p class="label">已搜索时间</p>
+          <strong id="searchedElapsed">—</strong>
+          <small>当前搜索任务累计运行时间</small>
+        </div>
+        <div>
+          <p class="label">距离 50%</p>
+          <strong id="until50">—</strong>
+          <small>距离半份平均工作量</small>
+        </div>
+        <div>
+          <p class="label">距离 100%</p>
+          <strong id="until100">—</strong>
+          <small>距离一份平均工作量</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-heading">
+      <div>
+        <p class="eyebrow">LIVE MACHINES</p>
+        <h2>机器明细</h2>
+      </div>
+      <p>每 2 秒并行刷新，单机断线不影响其他机器</p>
+    </section>
+
+    <section id="machines" class="machines" aria-live="polite">
+      <article class="panel placeholder">正在读取所有机器状态…</article>
+    </section>
+
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>

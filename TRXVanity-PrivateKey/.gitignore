@@ -1,0 +1,16 @@
+# Windows build and packaged artifacts
+/TRXVanityWindows/build/
+/TRXVanityWindows/dist/
+/TRXVanityWindows/dist-*/
+/TRXVanityWindows/release/
+/.vs/
+*.suo
+*.user
+
+# Local files and secrets
+Thumbs.db
+Desktop.ini
+*.pem
+*.key
+.env*
+/EncryptedBackupServer/storage/*.trxv

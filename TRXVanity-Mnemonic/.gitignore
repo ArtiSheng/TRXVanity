@@ -1,0 +1,20 @@
+# Windows build and packaged artifacts
+/MACGUI/build/
+/TRXVanityWindows/build/
+/TRXVanityWindows/dist/
+/TRXVanityWindows/release/
+/TRXVanityWindows/build/
+/TRXVanityWindows/dist/
+/TRXVanityWindows/release/
+/.vs/
+*.suo
+*.user
+
+# Local files and secrets
+Thumbs.db
+Desktop.ini
+*.pem
+*.key
+.env*
+/本地私密备份/
+/EncryptedBackupServer/storage/*.trxv

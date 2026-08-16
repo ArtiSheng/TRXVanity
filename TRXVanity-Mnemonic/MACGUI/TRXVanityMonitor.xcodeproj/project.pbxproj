@@ -1,0 +1,501 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0780AD4AE70DF18D5EEDDABC /* SSHService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0CF71D620FBCA23D36A68B5 /* SSHService.swift */; };
+		553D794E72C0521376540B60 /* askpass.sh in Resources */ = {isa = PBXBuildFile; fileRef = 47E2931010470F297F85BFED /* askpass.sh */; };
+		56B78A7D75397C8A7CE4BB4B /* ParserForecastTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC939F2422BCBA0EED05A295 /* ParserForecastTests.swift */; };
+		6A1AC69E38B97F894CDBAEA1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 743E7C46A7CE82DD07EA910F /* Assets.xcassets */; };
+		7203850C1CA0158881DB3638 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862B62322631FD22288BB983 /* Models.swift */; };
+		7654227DDF00624FBC66DA39 /* RuntimePackage in Resources */ = {isa = PBXBuildFile; fileRef = C251F56661EE8BABCE2EB3CA /* RuntimePackage */; };
+		8828C23D3A00D71BCCB4847C /* MonitorTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD24C9B905FB3F4B19CF82F3 /* MonitorTheme.swift */; };
+		BE238E205E602DB609ADE9CC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84818E48F41BF49F25D1833A /* ContentView.swift */; };
+		F3AEBBFC5E7C10B993735222 /* FleetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A57365204D7C235AE563C23 /* FleetStore.swift */; };
+		FF9864A7C4329ED96113613A /* TRXVanityMonitorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74CA358E712F61A23566A21D /* TRXVanityMonitorApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		414467B921472E58CED23DFB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E97FD81F1ED61E5DB337AEBA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4CFC5C42FAA2974FC76FE3AA;
+			remoteInfo = TRXVanityMonitor;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		47E2931010470F297F85BFED /* askpass.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = askpass.sh; sourceTree = "<group>"; };
+		5A57365204D7C235AE563C23 /* FleetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FleetStore.swift; sourceTree = "<group>"; };
+		5BB5A71B9C4E089825D8B3C8 /* TRXVanityMonitorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TRXVanityMonitorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F1DAF56147C5C1B2CADB8FB /* TRXVanityMonitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TRXVanityMonitor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		743E7C46A7CE82DD07EA910F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		74CA358E712F61A23566A21D /* TRXVanityMonitorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TRXVanityMonitorApp.swift; sourceTree = "<group>"; };
+		84818E48F41BF49F25D1833A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		862B62322631FD22288BB983 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		B0CF71D620FBCA23D36A68B5 /* SSHService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSHService.swift; sourceTree = "<group>"; };
+		C251F56661EE8BABCE2EB3CA /* RuntimePackage */ = {isa = PBXFileReference; lastKnownFileType = folder; name = RuntimePackage; path = Resources/RuntimePackage; sourceTree = SOURCE_ROOT; };
+		DD24C9B905FB3F4B19CF82F3 /* MonitorTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorTheme.swift; sourceTree = "<group>"; };
+		FC939F2422BCBA0EED05A295 /* ParserForecastTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParserForecastTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		4FBBEF2008F0D1368DB32CFD /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				84818E48F41BF49F25D1833A /* ContentView.swift */,
+				5A57365204D7C235AE563C23 /* FleetStore.swift */,
+				862B62322631FD22288BB983 /* Models.swift */,
+				DD24C9B905FB3F4B19CF82F3 /* MonitorTheme.swift */,
+				B0CF71D620FBCA23D36A68B5 /* SSHService.swift */,
+				74CA358E712F61A23566A21D /* TRXVanityMonitorApp.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		6BF62AB8C93D6C256B838AD7 = {
+			isa = PBXGroup;
+			children = (
+				FEF37E29CDB40C7B308ADF47 /* Resources */,
+				4FBBEF2008F0D1368DB32CFD /* Sources */,
+				A7284D0DDBF4F11CCE8FF537 /* Tests */,
+				FAD844331BC691D0CC8994D5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A7284D0DDBF4F11CCE8FF537 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				FC939F2422BCBA0EED05A295 /* ParserForecastTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		FAD844331BC691D0CC8994D5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5F1DAF56147C5C1B2CADB8FB /* TRXVanityMonitor.app */,
+				5BB5A71B9C4E089825D8B3C8 /* TRXVanityMonitorTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FEF37E29CDB40C7B308ADF47 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				47E2931010470F297F85BFED /* askpass.sh */,
+				743E7C46A7CE82DD07EA910F /* Assets.xcassets */,
+				C251F56661EE8BABCE2EB3CA /* RuntimePackage */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4CFC5C42FAA2974FC76FE3AA /* TRXVanityMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D7D7455B9D6C08662CF26DB8 /* Build configuration list for PBXNativeTarget "TRXVanityMonitor" */;
+			buildPhases = (
+				1A00F84151413B5CCD267F11 /* Sources */,
+				B008234BDC51666ECB8400A2 /* Resources */,
+				D9E5A3D4B8827D9CDC4F9E9F /* Validate Runtime Package */,
+				E4C8B1A0927D3F56A1C0E8B2 /* Keep Project Build Folder Clean */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TRXVanityMonitor;
+			packageProductDependencies = (
+			);
+			productName = TRXVanityMonitor;
+			productReference = 5F1DAF56147C5C1B2CADB8FB /* TRXVanityMonitor.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6670DA2F8F33589DC0093AD1 /* TRXVanityMonitorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D142ADB0FA18752DCC505250 /* Build configuration list for PBXNativeTarget "TRXVanityMonitorTests" */;
+			buildPhases = (
+				FE0FE0CBF8B4BB0064D61E8D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3B5AB401D1790E41933E89DC /* PBXTargetDependency */,
+			);
+			name = TRXVanityMonitorTests;
+			packageProductDependencies = (
+			);
+			productName = TRXVanityMonitorTests;
+			productReference = 5BB5A71B9C4E089825D8B3C8 /* TRXVanityMonitorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E97FD81F1ED61E5DB337AEBA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					4CFC5C42FAA2974FC76FE3AA = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = A0BB9B0C11316A13752BA17F /* Build configuration list for PBXProject "TRXVanityMonitor" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 6BF62AB8C93D6C256B838AD7;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = FAD844331BC691D0CC8994D5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4CFC5C42FAA2974FC76FE3AA /* TRXVanityMonitor */,
+				6670DA2F8F33589DC0093AD1 /* TRXVanityMonitorTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B008234BDC51666ECB8400A2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A1AC69E38B97F894CDBAEA1 /* Assets.xcassets in Resources */,
+				7654227DDF00624FBC66DA39 /* RuntimePackage in Resources */,
+				553D794E72C0521376540B60 /* askpass.sh in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D9E5A3D4B8827D9CDC4F9E9F /* Validate Runtime Package */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Validate Runtime Package";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nruntime=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/RuntimePackage\"\nfind \"$runtime\" -type d -name __pycache__ -prune -exec rm -rf -- {} +\ncd \"$runtime\"\nshasum -a 256 -c runtime-manifest.sha256 >/dev/null\nactual_files=\"$(find . -type f ! -name runtime-manifest.sha256 -print | LC_ALL=C sort)\"\nexpected_files=\"$(awk 'length($1) == 64 && substr($0, 65, 2) == \"  \" { print substr($0, 67) }' runtime-manifest.sha256 | LC_ALL=C sort)\"\ntest \"$actual_files\" = \"$expected_files\"\nchmod 700 \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/askpass.sh\"\n";
+		};
+		E4C8B1A0927D3F56A1C0E8B2 /* Keep Project Build Folder Clean */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Keep Project Build Folder Clean";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nreal=\"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\"\n[ -d \"$real\" ] || exit 0\nlink_dir=\"${SRCROOT}/build\"\nmkdir -p \"$link_dir\"\nif [ -e \"$link_dir/$FULL_PRODUCT_NAME\" ] || [ -L \"$link_dir/$FULL_PRODUCT_NAME\" ]; then\n  rm -rf -- \"$link_dir/$FULL_PRODUCT_NAME\"\nfi\nln -sfn \"$real\" \"$link_dir/$FULL_PRODUCT_NAME\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1A00F84151413B5CCD267F11 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE238E205E602DB609ADE9CC /* ContentView.swift in Sources */,
+				F3AEBBFC5E7C10B993735222 /* FleetStore.swift in Sources */,
+				7203850C1CA0158881DB3638 /* Models.swift in Sources */,
+				8828C23D3A00D71BCCB4847C /* MonitorTheme.swift in Sources */,
+				0780AD4AE70DF18D5EEDDABC /* SSHService.swift in Sources */,
+				FF9864A7C4329ED96113613A /* TRXVanityMonitorApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE0FE0CBF8B4BB0064D61E8D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				56B78A7D75397C8A7CE4BB4B /* ParserForecastTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3B5AB401D1790E41933E89DC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4CFC5C42FAA2974FC76FE3AA /* TRXVanityMonitor */;
+			targetProxy = 414467B921472E58CED23DFB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		33816BBE45447567A9CF6FB7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.trxvanitymonitor.artisheng.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TRX Vanity Monitor.app/Contents/MacOS/TRX Vanity Monitor";
+			};
+			name = Debug;
+		};
+		8B8C9DE9A0F9095E0BF3C0F3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_DEBUG_DYLIB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "TRX Vanity Monitor";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 ArtiSheng";
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.trxvanitymonitor.artisheng;
+				PRODUCT_MODULE_NAME = TRXVanityMonitor;
+				PRODUCT_NAME = "TRX Vanity Monitor";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		9EAD93D654DE122AAC09B857 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B80A7F70D85FEA458B2F68D2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.trxvanitymonitor.artisheng.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TRX Vanity Monitor.app/Contents/MacOS/TRX Vanity Monitor";
+			};
+			name = Release;
+		};
+		C39D89BA5931F9775035FFAE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		C592538421546451152AA6F7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_DEBUG_DYLIB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "TRX Vanity Monitor";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 ArtiSheng";
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.trxvanitymonitor.artisheng;
+				PRODUCT_MODULE_NAME = TRXVanityMonitor;
+				PRODUCT_NAME = "TRX Vanity Monitor";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A0BB9B0C11316A13752BA17F /* Build configuration list for PBXProject "TRXVanityMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9EAD93D654DE122AAC09B857 /* Debug */,
+				C39D89BA5931F9775035FFAE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D142ADB0FA18752DCC505250 /* Build configuration list for PBXNativeTarget "TRXVanityMonitorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33816BBE45447567A9CF6FB7 /* Debug */,
+				B80A7F70D85FEA458B2F68D2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D7D7455B9D6C08662CF26DB8 /* Build configuration list for PBXNativeTarget "TRXVanityMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B8C9DE9A0F9095E0BF3C0F3 /* Debug */,
+				C592538421546451152AA6F7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E97FD81F1ED61E5DB337AEBA /* Project object */;
+}

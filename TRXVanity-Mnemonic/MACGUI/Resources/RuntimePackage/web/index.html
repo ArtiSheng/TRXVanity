@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>TRX Vanity Linux 监控</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">TRX VANITY LINUX</p>
+        <h1>GPU 搜索状态</h1>
+      </div>
+      <div class="connection"><span id="dot"></span><span id="connection">正在连接…</span></div>
+    </header>
+
+    <section class="hero panel">
+      <div>
+        <p class="label">当前状态</p>
+        <div class="state-row"><span id="state" class="state">启动中</span><span id="suffix" class="suffix"></span></div>
+        <p id="detail" class="detail">正在读取服务器状态</p>
+      </div>
+      <div class="updated"><span>最后更新</span><strong id="updated">—</strong></div>
+    </section>
+
+    <section class="metrics">
+      <article class="panel"><p class="label">搜索次数</p><strong id="attempts">—</strong></article>
+      <article class="panel"><p class="label">实时速度</p><strong id="speed">—</strong><small>/ 秒</small></article>
+      <article class="panel"><p class="label">已搜索时间</p><strong id="elapsed">—</strong></article>
+    </section>
+
+    <section class="forecast panel">
+      <div class="forecast-heading">
+        <div>
+          <p class="label">当前搜索百分比</p>
+          <strong id="progress">—</strong>
+        </div>
+        <div class="probability">
+          <p class="label">当前累计命中概率</p>
+          <strong id="probability">—</strong>
+        </div>
+      </div>
+      <div class="progress-track" aria-hidden="true"><span id="progressBar"></span></div>
+      <div class="forecast-grid">
+        <div>
+          <p class="label">预计搜索时间</p>
+          <strong id="expected">—</strong>
+          <small>100% 平均工作量所需总时间</small>
+        </div>
+        <div>
+          <p class="label">距离 50%</p>
+          <strong id="until50">—</strong>
+          <small>距离半份平均工作量</small>
+        </div>
+        <div>
+          <p class="label">距离 100%</p>
+          <strong id="until100">—</strong>
+          <small>距离一份平均工作量</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="panel info">
+        <h2>引擎</h2>
+        <dl>
+          <div><dt>GPU</dt><dd id="device">—</dd></div>
+          <div><dt>计算方案</dt><dd id="profile">—</dd></div>
+          <div><dt>CPU 工作线程</dt><dd id="cpuWorkers">—</dd></div>
+          <div><dt>CPU 可用配额</dt><dd id="cpuBudget">—</dd></div>
+          <div><dt>CUDA 批次</dt><dd id="batch">—</dd></div>
+          <div><dt>CUDA 线程块</dt><dd id="blocks">—</dd></div>
+          <div><dt>内核模式</dt><dd id="kernelMode">—</dd></div>
+          <div><dt>命中地址</dt><dd id="address">尚未命中</dd></div>
+        </dl>
+      </article>
+      <article class="panel info">
+        <h2>AES 密文备份</h2>
+        <dl>
+          <div><dt>上传状态</dt><dd id="backup">等待命中</dd></div>
+          <div><dt>回下载复验</dt><dd id="verified">未开始</dd></div>
+          <div><dt>邮件心跳</dt><dd id="heartbeat">尚未确认</dd></div>
+        </dl>
+      </article>
+    </section>
+
+    <p class="privacy">搜索进度以 58<sup>尾号长度</sup> 作为 100% 平均工作量。到达 100% 时累计命中概率约为 63.21%，不代表保证命中，进度也可能超过 100%。</p>
+    <p class="privacy privacy-security">本页只显示公开地址和搜索指标，不接收、保存或显示助记词与 AES 密钥。页面每 2 秒自动刷新。</p>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>

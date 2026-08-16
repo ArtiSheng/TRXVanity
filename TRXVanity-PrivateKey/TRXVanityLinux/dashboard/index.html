@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TRX 云端搜索监控台</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">TRX VANITY · SPLIT KEY</p>
+        <h1>云端搜索监控台</h1>
+        <p class="subtitle">远端 GPU 只搜索公开点偏移；完整私钥只在本地合成。</p>
+      </div>
+      <div id="connectionBadge" class="badge waiting"><span></span>正在连接</div>
+    </header>
+
+    <section id="errorPanel" class="error hidden" role="alert"></section>
+    <section id="securityStrip" class="security unverified">
+      <div class="shield">✓</div>
+      <div><strong id="securityTitle">正在验证 PUBLIC_ONLY</strong><p>网页不读取本地 .secret 或 .wallet，远端结果仍需本地复验。</p></div>
+    </section>
+
+    <section class="grid two">
+      <article class="card">
+        <div class="label">搜索状态</div>
+        <div class="status-line"><span id="stateDot" class="dot"></span><strong id="state">—</strong></div>
+        <div class="pattern"><span>目标后缀</span><b id="suffix">—</b></div>
+        <dl>
+          <div><dt>任务 ID</dt><dd id="jobId">—</dd></div>
+          <div><dt>进程 PID</dt><dd id="pid">—</dd></div>
+          <div><dt>启动时间</dt><dd id="startedAt">—</dd></div>
+          <div><dt>结果回传</dt><dd id="deliveryState" class="delivery waiting">等待命中</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <div class="label">平均吞吐</div>
+        <div class="metric"><strong id="speed">—</strong><span>次 / 秒</span></div>
+        <div class="meter"><div id="chanceBar"></div></div>
+        <div class="row"><span>累计命中概率（估算）</span><strong id="chance">—</strong></div>
+        <dl>
+          <div><dt>已尝试</dt><dd id="attempts">— 亿次</dd></div>
+          <div><dt>已运行</dt><dd id="elapsed">—</dd></div>
+          <div><dt>50% 概率还需</dt><dd id="eta50">—</dd></div>
+        </dl>
+      </article>
+    </section>
+
+    <section class="grid hardware">
+      <article class="card">
+        <div class="label">远端设备</div>
+        <h2 id="gpu">—</h2><p class="accent" id="device">—</p>
+        <dl>
+          <div><dt>主机</dt><dd id="host">—</dd></div>
+          <div><dt>系统</dt><dd id="os">—</dd></div>
+          <div><dt>驱动</dt><dd id="driver">—</dd></div>
+          <div><dt>并行 lanes</dt><dd id="lanes">—</dd></div>
+        </dl>
+      </article>
+      <article class="card">
+        <div class="label">GPU 负载</div>
+        <div class="row"><span>利用率</span><strong id="utilization">—</strong></div>
+        <div class="meter"><div id="utilizationBar"></div></div>
+        <div class="row"><span>显存</span><strong id="memory">—</strong></div>
+        <div class="meter"><div id="memoryBar"></div></div>
+        <div class="mini"><div><span>温度</span><strong id="temperature">—</strong></div><div><span>功耗</span><strong id="power">—</strong></div></div>
+      </article>
+    </section>
+
+    <section id="resultCard" class="card result hidden">
+      <div class="label">已命中，等待本地合成</div><h2 id="resultAddress">—</h2>
+      <p><span id="resultSync" class="delivery waiting">正在同步到 Mac</span></p>
+      <dl>
+        <div><dt>本地结果文件</dt><dd id="resultPath">—</dd></div>
+        <div><dt>保存时间</dt><dd id="resultSavedAt">—</dd></div>
+      </dl>
+      <p>完整私钥未出现在云端；本地结果仍会由客户端重新计算地址、核对后缀后才能生成钱包。</p>
+    </section>
+
+    <section class="card logs">
+      <div class="log-head"><div><div class="label">远端实时日志</div><span id="lastUpdated">—</span></div><span id="logSize">0 B</span></div>
+      <pre id="log">等待远端数据…</pre>
+    </section>
+
+    <section class="card log-guide">
+      <div class="label">实时日志怎么看</div>
+      <div class="guide-grid">
+        <div><code>SECURITY</code><p>确认该任务是 PUBLIC_ONLY：云端只有公钥，没有本地基准私钥。</p></div>
+        <div><code>READY</code><p>GPU 初始化完成；最后的 lanes 是每批并行检查的候选槽数，不是 CPU 线程数。</p></div>
+        <div><code>SEARCHING</code><p>已经开始搜索指定后缀；这里应显示当前任务 ID 和 88888888。</p></div>
+        <div><code>PROGRESS</code><p>依次是协议版本、任务 ID、累计尝试数、从启动至今的平均速度、运行秒数。</p></div>
+        <div><code>RESULT</code><p>命中地址和公开偏移已产生；本地监控器会保存完整结果，偏移本身不是私钥。</p></div>
+        <div><code>STOPPED / ERROR</code><p>任务被停止，或在请求、自检、GPU 初始化、搜索阶段发生错误。</p></div>
+      </div>
+      <p class="footnote">页面日志只展示远端完整日志的最后 80 行，所以稳定运行后通常几乎都是 PROGRESS。</p>
+    </section>
+
+    <section class="reliability-note">
+      <strong>回传保障边界</strong>
+      <p>本地监控服务通常每 2 秒拉取一次，浏览器关闭不影响。网络恢复后会自动重连补取，一次失败的 SSH 超时可能使补取延后到约 2–12 秒；但如果 Mac 离线期间云实例被直接销毁，点对点传输无法保证找回尚未同步的结果。</p>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

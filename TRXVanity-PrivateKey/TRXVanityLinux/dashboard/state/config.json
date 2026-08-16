@@ -1,0 +1,9 @@
+{
+  "host": "gpu.example.com",
+  "port": 22,
+  "user": "demo",
+  "identity_file": "/absolute/path/to/dashboard/state/monitor_ed25519",
+  "known_hosts_file": "/absolute/path/to/dashboard/state/known_hosts",
+  "result_directory": "/absolute/path/to/TRXVanityLinux/local-jobs",
+  "poll_interval_seconds": 2
+}

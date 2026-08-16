@@ -1,0 +1,37 @@
+# Native macOS build products and local Xcode state
+/.build/
+/DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.profraw
+
+# Preserved legacy web dependencies and build products
+/node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+/coverage
+/.next/
+/.vinext/
+/out/
+/dist/
+/.wrangler/
+/outputs/
+/work/
+/tsconfig.tsbuildinfo
+.vercel
+
+# Local files and secrets
+.DS_Store
+*.pem
+*.key
+.env*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
