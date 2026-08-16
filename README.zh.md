@@ -118,4 +118,10 @@ OpenSSL、CUDA mnemonic recovery、Profanity2、libsecp256k1 等第三方许可�
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=ArtiSheng/TRXVanity&type=Date)](https://www.star-history.com/#ArtiSheng/TRXVanity&Date)
+<a href="https://www.star-history.com/?repos=ArtiSheng%2FTRXVanity&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&theme=dark&legend=top-left&sealed_token=6DA-WqF-PouoHrAniowr6f1Y94TSNpMLSkpsLR_MojEyuyBov-WY5Mc-pCU1BhTdPtI4b1nmABTxrDVn9uiXR7mTtDh8Oha0jVB6mQYBBlF4oWG8cpo1xkD7HEYn-v8N4MM2WtYm6zn85axa5AvZsFlEJk7fypBM5B6fOkC6bYNMNnZghEf6i9amYQvz" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&legend=top-left&sealed_token=6DA-WqF-PouoHrAniowr6f1Y94TSNpMLSkpsLR_MojEyuyBov-WY5Mc-pCU1BhTdPtI4b1nmABTxrDVn9uiXR7mTtDh8Oha0jVB6mQYBBlF4oWG8cpo1xkD7HEYn-v8N4MM2WtYm6zn85axa5AvZsFlEJk7fypBM5B6fOkC6bYNMNnZghEf6i9amYQvz" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&legend=top-left&sealed_token=6DA-WqF-PouoHrAniowr6f1Y94TSNpMLSkpsLR_MojEyuyBov-WY5Mc-pCU1BhTdPtI4b1nmABTxrDVn9uiXR7mTtDh8Oha0jVB6mQYBBlF4oWG8cpo1xkD7HEYn-v8N4MM2WtYm6zn85axa5AvZsFlEJk7fypBM5B6fOkC6bYNMNnZghEf6i9amYQvz" />
+ </picture>
+</a>
