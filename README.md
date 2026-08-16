@@ -120,8 +120,8 @@ Third-party licenses for OpenSSL, CUDA mnemonic recovery, Profanity2, and libsec
 
 <a href="https://www.star-history.com/?repos=ArtiSheng%2FTRXVanity&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&theme=dark&legend=top-left&sealed_token=fvwHrxkiyriBQsDnRYGbJK4r8aE0r5T6hKIKOZL70D70XSVPBGvZ_zf3cFjY93c3A5tccZu-mPPY__xRsvNiLCGrnP4-VmqgHs5Pqo0NNsXLJ60tU1V3HiiUdp29S0sl-SZgyb_0CDwopi3KEaYLm227UQfiAKyDMSqMbUHtaZ_cGNVKgZ3U3EgZUZ_-" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&legend=top-left&sealed_token=fvwHrxkiyriBQsDnRYGbJK4r8aE0r5T6hKIKOZL70D70XSVPBGvZ_zf3cFjY93c3A5tccZu-mPPY__xRsvNiLCGrnP4-VmqgHs5Pqo0NNsXLJ60tU1V3HiiUdp29S0sl-SZgyb_0CDwopi3KEaYLm227UQfiAKyDMSqMbUHtaZ_cGNVKgZ3U3EgZUZ_-" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&legend=top-left&sealed_token=fvwHrxkiyriBQsDnRYGbJK4r8aE0r5T6hKIKOZL70D70XSVPBGvZ_zf3cFjY93c3A5tccZu-mPPY__xRsvNiLCGrnP4-VmqgHs5Pqo0NNsXLJ60tU1V3HiiUdp29S0sl-SZgyb_0CDwopi3KEaYLm227UQfiAKyDMSqMbUHtaZ_cGNVKgZ3U3EgZUZ_-" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&theme=dark&legend=top-left&sealed_token=90wO7CVJALpHdsa2dUaewqU1ULQYVaPYdrOggKnG81epXuSON9yZbjS9YdbKdTkjvFq1F8hmTkvvWNY0-NMBqcBlMX195e-FBCgqtFQtUYBTeMS1A9-sdqtqCi_PW2EWzfT5cexmxwH76QERqwaIaz-oB2zimYtrqUF2WqD9j2nsLl2z5JVDyBj2-uxg" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&legend=top-left&sealed_token=90wO7CVJALpHdsa2dUaewqU1ULQYVaPYdrOggKnG81epXuSON9yZbjS9YdbKdTkjvFq1F8hmTkvvWNY0-NMBqcBlMX195e-FBCgqtFQtUYBTeMS1A9-sdqtqCi_PW2EWzfT5cexmxwH76QERqwaIaz-oB2zimYtrqUF2WqD9j2nsLl2z5JVDyBj2-uxg" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&legend=top-left&sealed_token=90wO7CVJALpHdsa2dUaewqU1ULQYVaPYdrOggKnG81epXuSON9yZbjS9YdbKdTkjvFq1F8hmTkvvWNY0-NMBqcBlMX195e-FBCgqtFQtUYBTeMS1A9-sdqtqCi_PW2EWzfT5cexmxwH76QERqwaIaz-oB2zimYtrqUF2WqD9j2nsLl2z5JVDyBj2-uxg" />
  </picture>
 </a>
