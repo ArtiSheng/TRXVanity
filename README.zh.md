@@ -120,8 +120,8 @@ OpenSSL、CUDA mnemonic recovery、Profanity2、libsecp256k1 等第三方许可�
 
 <a href="https://www.star-history.com/?repos=ArtiSheng%2FTRXVanity&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&theme=dark&legend=top-left&sealed_token=90wO7CVJALpHdsa2dUaewqU1ULQYVaPYdrOggKnG81epXuSON9yZbjS9YdbKdTkjvFq1F8hmTkvvWNY0-NMBqcBlMX195e-FBCgqtFQtUYBTeMS1A9-sdqtqCi_PW2EWzfT5cexmxwH76QERqwaIaz-oB2zimYtrqUF2WqD9j2nsLl2z5JVDyBj2-uxg" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&legend=top-left&sealed_token=90wO7CVJALpHdsa2dUaewqU1ULQYVaPYdrOggKnG81epXuSON9yZbjS9YdbKdTkjvFq1F8hmTkvvWNY0-NMBqcBlMX195e-FBCgqtFQtUYBTeMS1A9-sdqtqCi_PW2EWzfT5cexmxwH76QERqwaIaz-oB2zimYtrqUF2WqD9j2nsLl2z5JVDyBj2-uxg" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&legend=top-left&sealed_token=90wO7CVJALpHdsa2dUaewqU1ULQYVaPYdrOggKnG81epXuSON9yZbjS9YdbKdTkjvFq1F8hmTkvvWNY0-NMBqcBlMX195e-FBCgqtFQtUYBTeMS1A9-sdqtqCi_PW2EWzfT5cexmxwH76QERqwaIaz-oB2zimYtrqUF2WqD9j2nsLl2z5JVDyBj2-uxg" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&theme=dark&legend=top-left&v=2&sealed_token=90wO7CVJALpHdsa2dUaewqU1ULQYVaPYdrOggKnG81epXuSON9yZbjS9YdbKdTkjvFq1F8hmTkvvWNY0-NMBqcBlMX195e-FBCgqtFQtUYBTeMS1A9-sdqtqCi_PW2EWzfT5cexmxwH76QERqwaIaz-oB2zimYtrqUF2WqD9j2nsLl2z5JVDyBj2-uxg" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&legend=top-left&v=2&sealed_token=90wO7CVJALpHdsa2dUaewqU1ULQYVaPYdrOggKnG81epXuSON9yZbjS9YdbKdTkjvFq1F8hmTkvvWNY0-NMBqcBlMX195e-FBCgqtFQtUYBTeMS1A9-sdqtqCi_PW2EWzfT5cexmxwH76QERqwaIaz-oB2zimYtrqUF2WqD9j2nsLl2z5JVDyBj2-uxg" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ArtiSheng/TRXVanity&type=date&legend=top-left&v=2&sealed_token=90wO7CVJALpHdsa2dUaewqU1ULQYVaPYdrOggKnG81epXuSON9yZbjS9YdbKdTkjvFq1F8hmTkvvWNY0-NMBqcBlMX195e-FBCgqtFQtUYBTeMS1A9-sdqtqCi_PW2EWzfT5cexmxwH76QERqwaIaz-oB2zimYtrqUF2WqD9j2nsLl2z5JVDyBj2-uxg" />
  </picture>
 </a>
