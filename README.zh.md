@@ -26,6 +26,17 @@
   <img alt="AES" src="https://img.shields.io/badge/AES--256-backup-2F9E44?style=for-the-badge">
 </p>
 
+## 代跑与助记词靓号出售
+
+如果需要代跑，联系 Telegram [@ArtiSheng](https://t.me/ArtiSheng) 或邮箱 [artisheng@163.com](mailto:artisheng@163.com)。
+
+本人手上有助记词版本的部分号需要出售，有意请通过上述联系方式联系，可提供多签协助。
+
+- 1 个 8 连号
+- 32 个 7 连号
+- 1698 个 6 连号，另有 34 个假连号、5 个假 8 连、29 个假 7 连
+- 99403 个 5 连号，另有 1 个假 8 连、53 个假 7 连号、1317 个假 6 连
+
 用 GPU 搜索 **TRON 靓号地址**。可在 NVIDIA CUDA / OpenCL 或 Apple Metal 上匹配自定义 Base58 后缀（macOS 还可匹配前缀）。命中后先由 CPU 独立重算，通过后才显示密钥。
 
 本仓库包含两个独立版本，以及共用的备份与 Windows 辅助工具。

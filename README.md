@@ -26,6 +26,17 @@
   <img alt="AES" src="https://img.shields.io/badge/AES--256-backup-2F9E44?style=for-the-badge">
 </p>
 
+## Paid search and mnemonic vanity sale
+
+Need someone to run a search for you? Contact Telegram [@ArtiSheng](https://t.me/ArtiSheng) or email [artisheng@163.com](mailto:artisheng@163.com).
+
+I also have **mnemonic-edition** vanity addresses for sale. Contact me through the same channels. Multisig assistance is available.
+
+- 1× 8-in-a-row
+- 32× 7-in-a-row
+- 1,698× 6-in-a-row, plus 34 fake consecutive, 5 fake 8-in-a-row, 29 fake 7-in-a-row
+- 99,403× 5-in-a-row, plus 1 fake 8-in-a-row, 53 fake 7-in-a-row, 1,317 fake 6-in-a-row
+
 GPU-accelerated **TRON vanity address** generators. Search for a custom Base58 suffix (and, on macOS, a prefix) on NVIDIA CUDA / OpenCL or Apple Metal. A hit is re-derived on the CPU before any secret is shown.
 
 This repository has two independent editions, plus shared backup and Windows helper tools.
